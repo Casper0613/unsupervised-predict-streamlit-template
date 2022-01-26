@@ -102,7 +102,6 @@ def main():
     # ------------- SAFE FOR ALTERING/EXTENSION -------------------
     if page_selection == "Main Page":
         st.title("Team 13 Movie Recomender system")
-        st.image()
 
     if page_selection == "Solution Overview":
         st.title("Solution Overview")
