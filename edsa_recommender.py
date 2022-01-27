@@ -36,10 +36,24 @@ import numpy as np
 from utils.data_loader import load_movie_titles
 from recommenders.collaborative_based import collab_model
 from recommenders.content_based import content_model
+import matplotlib
+import seaborn as sns 
+import matplotlib.pyplot as plt 
+from wordcloud import WordCloud, STOPWORDS
+
+
 
 # Data Loading
 title_list = load_movie_titles('resources/data/movies.csv')
+ratings = pd.read_csv("resources/data/movies.csv")
+movies = pd.read_csv("resources/data/ratings.csv")
+df = movies.merge(ratings)
+# Data Cleaning
+df['genres'] = df.genres.astype(str)
 
+df['genres'] = df['genres'].map(lambda x: x.lower().split('|'))
+df['genres'] = df['genres'].apply(lambda x: " ".join(x))
+st.set_page_config('centered')
 # App declaration
 def main():
 
@@ -101,11 +115,75 @@ def main():
 
     # ------------- SAFE FOR ALTERING/EXTENSION -------------------
     if page_selection == "Main Page":
-        st.title("Team 13 Movie Recomender system")
+        st.title("Team 13 Movie Recomender System")
+        st.image("resources/imgs/Main.jpg", use_column_width=True)
+        st.markdown("""
+        **Team : 13**
+        * **Joas Sebola Tsiri:** Leader
+        * **Casper Kruger:** Developed Streamlit app
+        * **Nthabiseng Moloisi:** Created Notebook
+        * **Rizqah Meniers:** Created Notebook
+        * **Tshiamo Nthite:** Created Notebook
+        """)
 
     if page_selection == "Solution Overview":
-        st.title("Solution Overview")
-        st.write("Describe your winning approach on this page")
+        st.image("resources/imgs/Solution1.jpg", width= 700 )
+        st.markdown("""
+        What we had to do:
+        * Merge the dataset, allowing us to use both datasets.
+        * Remove the pipes between genres, to be able to create graphs.
+        * And convert the data type of genres to string for string handling.
+
+        What we can see:
+        * The title of the movies and their allocated ID's.
+        * The genre category that each movie lies within.
+        * And the ratings each movie recieved.
+        """)
+        st.dataframe(df)
+        st.title("Rating Distribution")
+
+        grouped = pd.DataFrame(df.groupby(['rating'])['title'].count())
+        grouped.rename(columns={'title':'rating_count'}, inplace=True)
+        fig = plt.figure(figsize=(15,15))
+        ax = fig.add_subplot(122)
+        labels = ['0.5 Star', '1 Stars', '1.5 Stars', '2 Stars', '2.5 Stars', '3 Star', '3.5 Stars', '4 Stars', '4.5 Stars', '5 Stars']
+        theme = plt.get_cmap('Blues')
+        ax.set_prop_cycle("color", [theme(1. * i / len(labels))
+                                 for i in range(len(labels))])
+        sns.set(font_scale=1.25)
+        # Create pie chart
+        pie = ax.pie(grouped['rating_count'],
+                 autopct='%1.1f%%',
+                 shadow=True,
+                 startangle=20,
+                 pctdistance=1.115,
+                 explode=(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1))
+        plt.tight_layout()
+        plt.show()
+        st.pyplot(fig)
+
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.header("Most used ratings:")
+            st.info("""
+            * 4 Stars was the highest with 28.8%
+            * 3 Stars consisted of 20.1%
+            * 5 Stars consisted of 15.1%
+            * 3.5 Stars consisted of 10.5%
+            * 4.5 Stars consisted of 7.7%
+            """)
+
+        with col2:
+            st.header("Least used ratings:")
+            st.info("""
+            * 0.5 Stars was the least used rating with 1.1%
+            * 1.5 Stars consisted of 17%
+            * 1 Stars consisted of 3.3%
+            * 2.5 Stars consisted of 4.4%
+            * 2 Stars consisted of 7.3%
+            """)
+
 
     # You may want to add more sections here for aspects such as an EDA,
     # or to provide your business pitch.
