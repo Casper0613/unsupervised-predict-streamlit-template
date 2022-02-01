@@ -62,7 +62,7 @@ def main():
 
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
-    page_options = ["Main Page","Recommender System","Solution Overview"]
+    page_options = ["Main Page", "EDA", "Models","Recommender System"]
 
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
@@ -129,9 +129,9 @@ def main():
         * **Tshiamo Nthite:** Created Notebook
         """)
 
-    if page_selection == "Solution Overview":
+    if page_selection == "EDA":
         st.image("resources/imgs/Solution1.jpg", width= 700 )
-        st.markdown("""
+        st.info("""
         What we had to do:
         * Merge the dataset, allowing us to use both datasets.
         * Remove the pipes between genres, to be able to create graphs.
@@ -143,13 +143,20 @@ def main():
         * And the ratings each movie recieved.
         """)
 
+
+        genre = df['genres'].unique()
         
+        select_genre = st.sidebar.selectbox('Select the genre :', genre)
 
 
-        if st.button('Show raw data'):
-            st.dataframe(df)
         
-        st.title("Rating Distribution")
+        st.image("resources/imgs/genre.jpg", width= 200)
+        if st.button('Show raw data by Genre'):
+            st.dataframe(df['genre' == select_genre])
+
+        
+        
+        st.title("Rating Distribution and Freqeuncy")
 
         grouped = pd.DataFrame(df.groupby(['rating'])['title'].count())
         grouped.rename(columns={'title':'rating_count'}, inplace=True)
@@ -160,6 +167,14 @@ def main():
         ax.set_prop_cycle("color", [theme(1. * i / len(labels))
                                  for i in range(len(labels))])
         sns.set(font_scale=1.25)
+
+        pie = ax.pie(grouped['rating_count'],
+                 autopct='%1.1f%%',
+                 shadow=True,
+                 startangle=20,
+                 pctdistance=1.115,
+                 explode=(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1))
+                 
         
         plt.tight_layout()
         st.pyplot(fig)
@@ -180,11 +195,21 @@ def main():
             st.header("Least used ratings:")
             st.info("""
             * **0.5** - Stars was the least used rating with 1.1%
-            * **1.5** - Stars consisted of 17%
+            * **1.5** - Stars consisted of 1.7%
             * **1** - Stars consisted of 3.3%
             * **2.5** - Stars consisted of 4.4%
             * **2** - Stars consisted of 7.3%
             """)
+
+        st.image('resources/imgs/rating.png')
+
+        st.info("""
+            * From the rating distribution and freuqency it gives us a better understanding of the data.
+            * The distribution shows that 82.2% of all ratings given were above 3.
+            * The freqeuncy also shows that only a small amount of movies were given a multiple ratings.
+            """)
+
+
 
         st.title('Genres popularity:')   
         st.image("resources/imgs/genres.png", width= 850)
@@ -198,26 +223,35 @@ def main():
         * Which means people were more intrested in rating movies with these types of Genres than any other type.
         """)
 
-        st.title('Model we used:')
-        
-        st.image("resources/imgs/model.jpeg", width= 700 )
-        st.markdown('From here we decided wich models to use. Our decision came from each models advantages, disadvantages and how they performed against each other.')
-        
-        st.title('Collaborative recommender systems we used :')
-        st.image('resources/imgs/SVD.png')
-        st.header('(SVD) Singular Value Decomposition :')
         
 
+
+
+    if page_selection == "Models":
+        st.title('Recommender systems:')
+        
+        st.image("resources/imgs/model.jpeg", width= 700 )
+       
+        
+        st.title('Collaborative recommender systems we used:')
+        st.image('resources/imgs/SVD.png', width= 500)
+        st.info("""
+            * Collaborative Filtering is the most common technique used when it comes to building intelligent recommender systems that can learn to give better recommendations as more information about users is collected.
+            * It filters information by using the interactions and data collected by the system from other users.
+            * From here we decided wich models to use. Our decision came from each models advantages, disadvantages and how they performed against each other.
+            """)
+        st.header('(SVD) Singular Value Decomposition :')
         st.latex(r'''
-        A = U \sum V^T
+        A = UWV^T
         ''')
+        
 
         col3, col4 = st.columns(2)
 
         with col3:
             st.header('Advantages')
             st.info("""
-            * Can be apploed to non-square matrices
+            * Can be applied to non-square matrices
             * Making the observation have the largest variance
             * SVD can be utilized to sully forth pseudo-inverses.
             """)
@@ -249,6 +283,50 @@ def main():
             * Always needs to determine the value of K which may be complex some time.
             * The computation cost is high because of calculating the distance between the data points for all the training samples.
             """)
+
+        st.header("Content recommender system:")
+        st.image('resources/imgs/OIP.jpg', width= 400)
+
+        st.info("""
+            * A Content-Based Recommender works by the data that we take from the user, either explicitly (rating) or implicitly (clicking on a link).
+            * By the data we create a user profile, which is then used to suggest to the user, as the user provides more input or take more actions on the recommendation, the engine becomes more accurate.
+            """)
+
+        st.subheader('2 Methods for content based filtering :')
+        st.info("""
+        Method 1 : Vector space method
+        * Let us suppose you watch a crime thriller Movie, you review it on the internet. Also, you review one more Movie of the comedy genre with it and review the crime thriller Movie as good and the comedy one as bad. 
+        Now, a rating system is made according to the information provided by you. In the rating system from 0 to 5, crime thriller genres are ranked as 5, and other movies lie from 5 to 0 and the comedy ones lie at the lowest.
+        With this information, the next book recommendation you will get will be of crime thriller genres most probably as they are the highest rated genres for you.
+        For this ranking system, a user vector is created which ranks the information provided by you. After this, an item vector is created where movies are ranked according to their genres on it.
+        With the vector, every movie name is assigned a certain value by multiplying and getting the dot product of the user and item vector, and the value is then used for recommendation.
+        Like this, the dot products of all the available movies searched by you are ranked and according to it the top 5 or top 10 movies are assigned.
+        """)
+
+        st.info("""
+        Method 2 : 
+        * The second method is the classification method. In it, we can create a decision tree and find out if the user wants to watch a movie or not.
+        For example, a movie is considered, let it be Spider-man.
+        Based on the user data, we see that the genre is not a crime thriller, nor is it the type of movie you ever reviewed. With these classifications, we conclude that this movie shouldn’t be recommended to you.
+        """)
+
+        col7, col8 = st.columns(2)
+        with col7:
+            st.header('Advantages')
+            st.info("""
+            * Because the recommendations are tailored to a person, the model does not require any information about other users. This makes scaling of a big number of people more simple.
+            * The model can recognize a user's individual preferences and make recommendations for niche things that only a few other users are interested in.
+            * New items may be suggested before being rated by a large number of users, as opposed to collective filtering.
+            """)
+        with col8:
+            st.header('Disadvantages')
+            st.info("""
+            * This methodology necessitates a great deal of domain knowledge because the feature representation of the items is hand-engineered to some extent. As a result, the model can only be as good as the characteristics that were hand-engineered.
+            * The model can only give suggestions based on the user's current interests. To put it another way, the model's potential to build on the users' existing interests is limited.
+            * Since it must align the features of a user's profile with available products, content-based filtering offers only a small amount of novelty. 
+            """)
+
+
 
             
 
