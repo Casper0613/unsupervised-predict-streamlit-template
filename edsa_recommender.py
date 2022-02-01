@@ -26,6 +26,8 @@
 
 """
 # Streamlit dependencies
+from re import X
+from tkinter import Y
 import streamlit as st
 
 # Data handling dependencies
@@ -54,6 +56,7 @@ df['genres'] = df.genres.astype(str)
 df['genres'] = df['genres'].map(lambda x: x.lower().split('|'))
 df['genres'] = df['genres'].apply(lambda x: " ".join(x))
 st.set_page_config('centered')
+
 # App declaration
 def main():
 
@@ -139,7 +142,13 @@ def main():
         * The genre category that each movie lies within.
         * And the ratings each movie recieved.
         """)
-        st.dataframe(df)
+
+        
+
+
+        if st.button('Show raw data'):
+            st.dataframe(df)
+        
         st.title("Rating Distribution")
 
         grouped = pd.DataFrame(df.groupby(['rating'])['title'].count())
@@ -151,15 +160,8 @@ def main():
         ax.set_prop_cycle("color", [theme(1. * i / len(labels))
                                  for i in range(len(labels))])
         sns.set(font_scale=1.25)
-        # Create pie chart
-        pie = ax.pie(grouped['rating_count'],
-                 autopct='%1.1f%%',
-                 shadow=True,
-                 startangle=20,
-                 pctdistance=1.115,
-                 explode=(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1))
+        
         plt.tight_layout()
-        plt.show()
         st.pyplot(fig)
 
         col1, col2 = st.columns(2)
@@ -167,22 +169,89 @@ def main():
         with col1:
             st.header("Most used ratings:")
             st.info("""
-            * 4 Stars was the highest with 28.8%
-            * 3 Stars consisted of 20.1%
-            * 5 Stars consisted of 15.1%
-            * 3.5 Stars consisted of 10.5%
-            * 4.5 Stars consisted of 7.7%
+            * **4** - Stars was the highest with 28.8%
+            * **3** - Stars consisted of 20.1%
+            * **5** - Stars consisted of 15.1%
+            * **3.5** - Stars consisted of 10.5%
+            * **4.5** - Stars consisted of 7.7%
             """)
 
         with col2:
             st.header("Least used ratings:")
             st.info("""
-            * 0.5 Stars was the least used rating with 1.1%
-            * 1.5 Stars consisted of 17%
-            * 1 Stars consisted of 3.3%
-            * 2.5 Stars consisted of 4.4%
-            * 2 Stars consisted of 7.3%
+            * **0.5** - Stars was the least used rating with 1.1%
+            * **1.5** - Stars consisted of 17%
+            * **1** - Stars consisted of 3.3%
+            * **2.5** - Stars consisted of 4.4%
+            * **2** - Stars consisted of 7.3%
             """)
+
+        st.title('Genres popularity:')   
+        st.image("resources/imgs/genres.png", width= 850)
+        
+        st.header('What the graph shows:')
+        st.info("""
+        * Throughout the years the amount of times that movies was rated differs.
+        * The graph also shows that certain Genres where rated more than others.
+        * This could mean that the ratings poeple gave to movies was a factor of the type of movies that came out each year.
+        * The top 4 most rated genres are Drama, Comedy, Action and Thriller.
+        * Which means people were more intrested in rating movies with these types of Genres than any other type.
+        """)
+
+        st.title('Model we used:')
+        
+        st.image("resources/imgs/model.jpeg", width= 700 )
+        st.markdown('From here we decided wich models to use. Our decision came from each models advantages, disadvantages and how they performed against each other.')
+        
+        st.title('Collaborative recommender systems we used :')
+        st.image('resources/imgs/SVD.png')
+        st.header('(SVD) Singular Value Decomposition :')
+        
+
+        st.latex(r'''
+        A = U \sum V^T
+        ''')
+
+        col3, col4 = st.columns(2)
+
+        with col3:
+            st.header('Advantages')
+            st.info("""
+            * Can be apploed to non-square matrices
+            * Making the observation have the largest variance
+            * SVD can be utilized to sully forth pseudo-inverses.
+            """)
+        with col4:
+            st.header('Disadvantages')
+            st.info("""
+            * Computing is very slow
+            * Computationally expensive
+            * Requires care when dealing with missing data
+            """)
+
+        st.header('(KNN) K-Nearest Neighbor :')
+
+        st.latex(r'''
+        r_{ij} = \sum_k Similaries(u_i,u_k)r_{kj} / {number-of-ratings}
+        ''')
+
+        col5, col6 = st.columns(2)
+        with col5:
+            st.header('Advantages')
+            st.info("""
+            * It is simple to implement.
+            * It is robust to the noisy training data.
+            * It can be more effective if the training data is large.
+            """)
+        with col6:
+            st.header('Disadvantages')
+            st.info("""
+            * Always needs to determine the value of K which may be complex some time.
+            * The computation cost is high because of calculating the distance between the data points for all the training samples.
+            """)
+
+            
+
 
 
     # You may want to add more sections here for aspects such as an EDA,
