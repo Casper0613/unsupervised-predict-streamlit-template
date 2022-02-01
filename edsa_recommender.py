@@ -118,19 +118,18 @@ def main():
 
     # ------------- SAFE FOR ALTERING/EXTENSION -------------------
     if page_selection == "Main Page":
-        st.title("Team 13 Movie Recomender System")
-        st.image("resources/imgs/Main.jpg", use_column_width=True)
+        
+        st.image("resources/imgs/Main.jpg",  width= 800)
         st.markdown("""
-        **Team : 13**
-        * **Joas Sebola Tsiri:** Leader
-        * **Casper Kruger:** Developed Streamlit app
-        * **Nthabiseng Moloisi:** Created Notebook
-        * **Rizqah Meniers:** Created Notebook
-        * **Tshiamo Nthite:** Created Notebook
+        * **Joas Sebola Tsiri:** 
+        * **Casper Kruger:** 
+        * **Nthabiseng Moloisi:** 
+        * **Rizqah Meniers:** 
+        * **Tshiamo Nthite:** 
         """)
 
     if page_selection == "EDA":
-        st.image("resources/imgs/Solution1.jpg", width= 700 )
+        st.image("resources/imgs/b.jpg", width= 800 )
         st.info("""
         What we had to do:
         * Merge the dataset, allowing us to use both datasets.
@@ -145,14 +144,22 @@ def main():
 
 
         genre = df['genres'].unique()
-        
-        select_genre = st.sidebar.selectbox('Select the genre :', genre)
+        rating = df['rating'].unique()
+        select_genre = st.sidebar.selectbox('Select the Genre :', genre)
+        select_rating = st.sidebar.selectbox('Select the Rating :', rating)
 
 
         
         st.image("resources/imgs/genre.jpg", width= 200)
+
         if st.button('Show raw data by Genre'):
-            st.dataframe(df['genre' == select_genre])
+            st.dataframe(df[df['genres'] == select_genre])
+
+
+        st.image("resources/imgs/R.jpg", width= 200)
+
+        if st.button('Show raw data by rating'):
+            st.dataframe(df[df['rating'] == select_rating])
 
         
         
