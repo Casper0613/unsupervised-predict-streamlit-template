@@ -41,7 +41,7 @@ from recommenders.content_based import content_model
 import matplotlib
 import seaborn as sns 
 import matplotlib.pyplot as plt 
-from wordcloud import WordCloud, STOPWORDS
+
 
 
 
